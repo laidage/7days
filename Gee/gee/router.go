@@ -23,6 +23,7 @@ func (router *Router) handle(c *Context) {
 	}
 }
 
-func (router *Router) addRoute(key string, handle HandlerFunc) {
+func (router *Router) addRoute(method, pattern string, handle HandlerFunc) {
+	key := method + "-" + pattern
 	router.handlers[key] = handle
 }

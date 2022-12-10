@@ -18,8 +18,7 @@ func New() *Engine {
 }
 
 func (engine *Engine) addRoute(method, pattern string, handle HandlerFunc) {
-	key := method + "-" + pattern
-	engine.router.handlers[key] = handle
+	engine.router.addRoute(method, pattern, handle)
 }
 
 func (engine *Engine) GET(pattern string, handle HandlerFunc) {
