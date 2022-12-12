@@ -1,6 +1,9 @@
 package gee
 
-import "strings"
+import (
+	"strings"
+	"log"
+)
 
 // test: /hello/one /hello/two /:lang/ab /:lang/cd
 // 用来搜寻的，不是储存handler的结构
@@ -19,16 +22,20 @@ func NewNode() *Node {
 }
 
 func (node *Node) search(parts []string, height int) *Node {
-	if height == len(parts)-1 {
-		if node.Path == parts[len(parts)-1] {
-			return node
-		} else {
-			return nil
-		}
+	if height >= len(parts) {
+		return nil
 	}
 	for _, child := range node.Children {
+		log.Printf("%v", parts[height])
 		if parts[height] == child.Path || child.isWild == true {
-			resultNode := child.search(parts, height+1)
+			log.Printf("%v", parts[height])
+			var resultNode *Node
+			if height == len(parts) - 1 {
+				log.Printf("%v22", parts[height])
+				return child
+			} else {
+				 resultNode = child.search(parts, height+1)
+			}	
 			if resultNode != nil {
 				return resultNode
 			}
@@ -45,6 +52,7 @@ func (node *Node) insert(parts []string, height int) {
 			flag = index
 			if height == len(parts)-1 {
 				child.Pattern = strings.Join(parts, "/")
+				log.Printf("%v", child.Pattern)
 			} else {
 				child.insert(parts, height+1)
 			}
@@ -61,6 +69,7 @@ func (node *Node) insert(parts []string, height int) {
 		}
 		if height == len(parts)-1 {
 			childNode.Pattern = strings.Join(parts, "/")
+			log.Printf("%v", childNode.Pattern)
 		} else {
 			childNode.insert(parts, height+1)
 		}

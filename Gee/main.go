@@ -10,8 +10,12 @@ type H map[string]interface{}
 
 func main() {
 	engine := gee.New()
-	engine.GET("/hello", helloHandle)
-	engine.GET("/url", urlHandle)
+	engine.GET("", helloHandle)
+	engine.GET("/hello/one", helloHandle)
+	engine.GET("/:lang/1", urlHandle)
+	engine.GET("/hello/two", helloHandle)
+	engine.GET("/:lang/2", urlHandle)
+	engine.POST("/hello/three", helloHandle)
 	engine.Run(":9999")
 }
 
