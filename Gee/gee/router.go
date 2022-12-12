@@ -6,10 +6,11 @@ import (
 
 type Router struct {
 	handlers map[string]HandlerFunc
+	root     *Node
 }
 
 func newRouter() *Router {
-	return &Router{handlers: make(map[string]HandlerFunc)}
+	return &Router{handlers: make(map[string]HandlerFunc), root: NewNode()}
 }
 
 func (router *Router) handle(c *Context) {
