@@ -12,14 +12,18 @@ type Context struct {
 	Method     string
 	StatusCode int
 	Path       string
+	index      int
+	handlers   []HandlerFunc
 }
 
 func NewContext(w http.ResponseWriter, req *http.Request) *Context {
 	return &Context{
-		W:      w,
-		Req:    req,
-		Path:   req.URL.Path,
-		Method: req.Method,
+		W:        w,
+		Req:      req,
+		Path:     req.URL.Path,
+		Method:   req.Method,
+		index:    -1,
+		handlers: make([]HandlerFunc, 0),
 	}
 }
 
