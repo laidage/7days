@@ -2,7 +2,6 @@ package gee
 
 import (
 	"strings"
-	"log"
 )
 
 // test: /hello/one /hello/two /:lang/ab /:lang/cd
@@ -14,28 +13,27 @@ type Node struct {
 	Path     string
 }
 
-func NewNode() *Node {
+func newNode() *Node {
 	return &Node{
 		Pattern:  "",
 		Children: make([]*Node, 0),
+		isWild:   false,
 	}
 }
 
 func (node *Node) search(parts []string, height int) *Node {
-	if height >= len(parts) {
-		return nil
-	}
 	for _, child := range node.Children {
-		log.Printf("%v", parts[height])
 		if parts[height] == child.Path || child.isWild == true {
-			log.Printf("%v", parts[height])
 			var resultNode *Node
-			if height == len(parts) - 1 {
-				log.Printf("%v22", parts[height])
-				return child
+			if height == len(parts)-1 {
+				if child.Pattern == "" {
+					return nil
+				} else {
+					return child
+				}
 			} else {
-				 resultNode = child.search(parts, height+1)
-			}	
+				resultNode = child.search(parts, height+1)
+			}
 			if resultNode != nil {
 				return resultNode
 			}
@@ -51,8 +49,7 @@ func (node *Node) insert(parts []string, height int) {
 		if child.Path == parts[height] {
 			flag = index
 			if height == len(parts)-1 {
-				child.Pattern = strings.Join(parts, "/")
-				log.Printf("%v", child.Pattern)
+				child.Pattern = strings.Join(parts, "-")
 			} else {
 				child.insert(parts, height+1)
 			}
@@ -60,16 +57,13 @@ func (node *Node) insert(parts []string, height int) {
 		}
 	}
 	if flag == -1 {
-		childNode := NewNode()
+		childNode := newNode()
 		childNode.Path = parts[height]
 		if strings.Contains(parts[height], "*") || strings.Contains(parts[height], ":") {
 			childNode.isWild = true
-		} else {
-			childNode.isWild = false
 		}
 		if height == len(parts)-1 {
-			childNode.Pattern = strings.Join(parts, "/")
-			log.Printf("%v", childNode.Pattern)
+			childNode.Pattern = strings.Join(parts, "-")
 		} else {
 			childNode.insert(parts, height+1)
 		}

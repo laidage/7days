@@ -3,7 +3,6 @@ package gee
 import (
 	"net/http"
 	"strings"
-	"log"
 )
 
 type Router struct {
@@ -12,7 +11,7 @@ type Router struct {
 }
 
 func newRouter() *Router {
-	return &Router{handlers: make(map[string]HandlerFunc), root: NewNode()}
+	return &Router{handlers: make(map[string]HandlerFunc), root: newNode()}
 }
 
 func parsePattern(method, pattern string) []string {
@@ -28,11 +27,9 @@ func parsePattern(method, pattern string) []string {
 
 func (router *Router) handle(c *Context) {
 	parts := parsePattern(c.Method, c.Path)
-	log.Printf("%v", parts)
 	node := router.root.search(parts, 0)
 	if node != nil {
 		key := node.Pattern
-		log.Printf("%v", key)
 		handle := router.handlers[key]
 		handle(c)
 	} else {
@@ -42,10 +39,8 @@ func (router *Router) handle(c *Context) {
 }
 
 func (router *Router) addRoute(method, pattern string, handle HandlerFunc) {
-	key := method + pattern
-	log.Printf("%v", key)
-	router.handlers[key] = handle
 	parts := parsePattern(method, pattern)
-	log.Printf("%v", parts)
+	key := strings.Join(parts, "-")
+	router.handlers[key] = handle
 	router.root.insert(parts, 0)
 }

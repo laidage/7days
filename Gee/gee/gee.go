@@ -2,7 +2,6 @@
 package gee
 
 import (
-	"log"
 	"net/http"
 )
 
@@ -22,17 +21,14 @@ func (engine *Engine) addRoute(method, pattern string, handle HandlerFunc) {
 }
 
 func (engine *Engine) GET(pattern string, handle HandlerFunc) {
-	log.Printf("get")
 	engine.addRoute("GET", pattern, handle)
 }
 
 func (engine *Engine) POST(pattern string, handle HandlerFunc) {
-	log.Printf("post")
 	engine.addRoute("POST", pattern, handle)
 }
 
 func (engine *Engine) Run(addr string) (err error) {
-	log.Printf("run")
 	return http.ListenAndServe(addr, engine)
 }
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
