@@ -14,6 +14,7 @@ func main() {
 	engine.GET("/hello/one", helloHandle)
 	engine.GET("/:lang/1", urlHandle)
 	engine.GET("/hello/two", helloHandle)
+	engine.GET("/nil/*", helloHandle)
 	engine.GET("/:lang/2", urlHandle)
 	engine.POST("/hello/three", helloHandle)
 	engine.Run(":9999")

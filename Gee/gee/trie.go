@@ -25,7 +25,7 @@ func (node *Node) search(parts []string, height int) *Node {
 	for _, child := range node.Children {
 		if parts[height] == child.Path || child.isWild == true {
 			var resultNode *Node
-			if height == len(parts)-1 {
+			if height == len(parts)-1 || strings.HasPrefix(child.Path, "*") {
 				if child.Pattern == "" {
 					return nil
 				} else {
