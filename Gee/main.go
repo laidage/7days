@@ -17,6 +17,8 @@ func main() {
 	engine.GET("/nil/*", helloHandle)
 	engine.GET("/:lang/2", urlHandle)
 	engine.POST("/hello/three", helloHandle)
+	group := engine.Group("/vvv")
+	group.GET("/:lang/2", urlHandle)
 	engine.Run(":9999")
 }
 

@@ -7,25 +7,43 @@ import (
 
 // router map["method-url"] = handlerfunc
 type Engine struct {
+	*RouterGroup
 	router *Router
+}
+
+type RouterGroup struct {
+	prefix string
+	engine *Engine
 }
 
 type HandlerFunc func(c *Context)
 
 func New() *Engine {
-	return &Engine{router: newRouter()}
+	engine := &Engine{
+		router: newRouter(),
+	}
+	engine.RouterGroup = &RouterGroup{engine: engine}
+	return engine
 }
 
-func (engine *Engine) addRoute(method, pattern string, handle HandlerFunc) {
-	engine.router.addRoute(method, pattern, handle)
+func (group *RouterGroup) Group(prefix string) *RouterGroup {
+	return &RouterGroup{
+		prefix: group.prefix + prefix,
+		engine: group.engine,
+	}
 }
 
-func (engine *Engine) GET(pattern string, handle HandlerFunc) {
-	engine.addRoute("GET", pattern, handle)
+func (group *RouterGroup) addRoute(method, pattern string, handle HandlerFunc) {
+	pattern = group.prefix + pattern
+	group.engine.router.addRoute(method, pattern, handle)
 }
 
-func (engine *Engine) POST(pattern string, handle HandlerFunc) {
-	engine.addRoute("POST", pattern, handle)
+func (group *RouterGroup) GET(pattern string, handle HandlerFunc) {
+	group.addRoute("GET", pattern, handle)
+}
+
+func (group *RouterGroup) POST(pattern string, handle HandlerFunc) {
+	group.addRoute("POST", pattern, handle)
 }
 
 func (engine *Engine) Run(addr string) (err error) {
