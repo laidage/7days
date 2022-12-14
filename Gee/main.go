@@ -40,10 +40,15 @@ func main() {
 	engine.GET("/nil/*", helloHandle)
 	engine.GET("/:lang/2", urlHandle)
 	engine.POST("/hello/three", helloHandle)
+	engine.GET("/panic", panicHandle)
 	group := engine.Group("/vvv")
 	group.Use(logger2())
 	group.GET("/:lang/2", urlHandle)
+	group2 := engine.Group("/v3")
+	group2.Use(gee.Recovery())
+	group2.GET("/panic", panicHandle)
 	engine.Run(":9999")
+
 }
 
 func helloHandle(c *gee.Context) {
@@ -56,4 +61,9 @@ func urlHandle(c *gee.Context) {
 		"url": c.Path,
 	}
 	c.Json(http.StatusOK, url)
+}
+
+func panicHandle(c *gee.Context) {
+	names := []string{"a"}
+	c.String(http.StatusOK, "%v", names[100])
 }
