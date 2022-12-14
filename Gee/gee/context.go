@@ -62,3 +62,10 @@ func (c *Context) String(code int, format string, values ...string) {
 	c.Status(code)
 	fmt.Fprintf(c.W, format, values)
 }
+
+func (c *Context) Next() {
+	c.index++
+	for ; c.index < len(c.handlers); c.index++ {
+		c.handlers[c.index](c)
+	}
+}

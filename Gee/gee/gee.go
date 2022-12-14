@@ -3,17 +3,20 @@ package gee
 
 import (
 	"net/http"
+	"strings"
 )
 
 // router map["method-url"] = handlerfunc
 type Engine struct {
 	*RouterGroup
 	router *Router
+	groups []*RouterGroup
 }
 
 type RouterGroup struct {
-	prefix string
-	engine *Engine
+	prefix   string
+	engine   *Engine
+	middlers []HandlerFunc
 }
 
 type HandlerFunc func(c *Context)
@@ -23,14 +26,22 @@ func New() *Engine {
 		router: newRouter(),
 	}
 	engine.RouterGroup = &RouterGroup{engine: engine}
+	engine.groups = []*RouterGroup{engine.RouterGroup}
 	return engine
 }
 
 func (group *RouterGroup) Group(prefix string) *RouterGroup {
-	return &RouterGroup{
-		prefix: group.prefix + prefix,
-		engine: group.engine,
+	newGroup := &RouterGroup{
+		prefix:   group.prefix + prefix,
+		engine:   group.engine,
+		middlers: make([]HandlerFunc, 0),
 	}
+	group.engine.groups = append(group.engine.groups, newGroup)
+	return newGroup
+}
+
+func (group *RouterGroup) Use(h ...HandlerFunc) {
+	group.middlers = append(group.middlers, h...)
 }
 
 func (group *RouterGroup) addRoute(method, pattern string, handle HandlerFunc) {
@@ -51,5 +62,10 @@ func (engine *Engine) Run(addr string) (err error) {
 }
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	context := NewContext(w, req)
+	for _, group := range engine.groups {
+		if strings.HasPrefix(req.URL.Path, group.prefix) {
+			context.handlers = append(context.handlers, group.middlers...)
+		}
+	}
 	engine.router.handle(context)
 }

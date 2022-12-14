@@ -31,11 +31,13 @@ func (router *Router) handle(c *Context) {
 	if node != nil {
 		key := node.Pattern
 		handle := router.handlers[key]
-		handle(c)
+		c.handlers = append(c.handlers, handle)
 	} else {
-		c.HTML(http.StatusNotFound, "<p>404 not found.</p>")
-
+		c.handlers = append(c.handlers, func(c *Context) {
+			c.HTML(http.StatusNotFound, "<p>404 not found.</p>")
+		})
 	}
+	c.Next()
 }
 
 func (router *Router) addRoute(method, pattern string, handle HandlerFunc) {
