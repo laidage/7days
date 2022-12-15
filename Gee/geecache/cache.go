@@ -41,12 +41,29 @@ func (c *Cache) Get(key string) (value Value, ok bool) {
 
 func (c *Cache) Add(key string, value Value) {
 	if ele, ok := c.cache[key]; ok {
-
+		c.ll.MoveToFront(ele)
+		kv := ele.Value.(*Entry)
+		c.nBytes += int64(value.Len() - kv.value.Len())
+		kv.value = value
 	} else {
-
+		ele := &Entry{
+			key:   key,
+			value: value,
+		}
+		c.ll.PushFront(ele)
+		c.nBytes += int64(value.Len() + len(key))
+	}
+	for c.maxBytes != 0 && c.maxBytes < c.nBytes {
+		c.RemoveOldest()
 	}
 }
 
-func RemoveOldest() {
-
+func (c *Cache) RemoveOldest() {
+	ele := c.ll.Back()
+	if ele != nil {
+		kv := ele.Value.(*Entry)
+		delete(c.cache, kv.key)
+		c.ll.Remove(ele)
+		c.nBytes -= int64(len(kv.key) + kv.value.Len())
+	}
 }
