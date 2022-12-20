@@ -46,11 +46,12 @@ func (c *Cache) Add(key string, value Value) {
 		c.nBytes += int64(value.Len() - kv.value.Len())
 		kv.value = value
 	} else {
-		ele := &Entry{
+		entry := &Entry{
 			key:   key,
 			value: value,
 		}
-		c.ll.PushFront(ele)
+		ele := c.ll.PushFront(entry)
+		c.cache[key] = ele
 		c.nBytes += int64(value.Len() + len(key))
 	}
 	for c.maxBytes != 0 && c.maxBytes < c.nBytes {
