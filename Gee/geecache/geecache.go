@@ -45,7 +45,7 @@ func NewGroup(name string, opacity int64, getter GetterFunc) *Group {
 func GetGroup(name string) *Group {
 	mu.RLock()
 	group := groups[name]
-	mu.Unlock()
+	mu.RUnlock()
 	return group
 }
 

@@ -30,7 +30,7 @@ func logger2() gee.HandlerFunc {
 	}
 }
 
-func main() {
+func main2() {
 	engine := gee.New()
 	engine.Use(logger())
 	engine.GET("", helloHandle)
