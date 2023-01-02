@@ -27,12 +27,12 @@ func NewCHash(replicas int, fn HashFunc) *CHash {
 	return ch
 }
 
-func (ch *CHash) Add(keys ...string) {
-	for _, key := range keys {
+func (ch *CHash) Add(machineNames ...string) {
+	for _, machineName := range machineNames {
 		for i := 0; i < ch.replicas; i++ {
-			hashValue := int(ch.hash([]byte(strconv.Itoa(i) + key)))
+			hashValue := int(ch.hash([]byte(strconv.Itoa(i) + machineName)))
 			ch.keys = append(ch.keys, hashValue)
-			ch.hashMap[hashValue] = key
+			ch.hashMap[hashValue] = machineName
 		}
 	}
 	sort.Ints(ch.keys)
